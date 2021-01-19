@@ -1,12 +1,13 @@
 # questions
 # 1. is the remove functionality only required to work with coach_ID and team_ID?
 # 2. in project specification you mention the requirement to make sure there aren't any digits in our coaches names
-	# however in the example input output you proceed to load the coach John Proba1 into the database
+# however in the example input output you proceed to load the coach John Proba1 into the database
 # 3. First team Begin fuuls has BEGIN as the team id in the input/output file and BEG in the file given to load. Which one is final one?
 
 from coach import Coach
 from team import Team
 import csv
+
 # coaches_by_name is the query structured as first_name=John or just john?
 coach_list = []
 team_list = []
@@ -115,6 +116,7 @@ def add_coach(raw_coach_query_list):
 	              team)
 	coach_list.append(coach)
 
+
 def add_team(raw_team_query_list):
 	stripped_list = [element.strip() for element in raw_team_query_list]
 
@@ -144,7 +146,7 @@ def load_coaches(file_name):
 		# to skip the header of the file
 		next(coach_reader)
 		for row in coach_reader:
-			#need to insert the dummy first command element to the row before processing.
+			# need to insert the dummy first command element to the row before processing.
 			row.insert(0, 'load_coaches')
 			add_coach(row)
 
@@ -169,6 +171,7 @@ def print_teams(teams):
 	for team in teams:
 		print(team)
 
+
 def remove_coach(coach_id_deletable):
 	# filter the new coach list from the current coach list by not having the coaches with ID to remove
 	new_coaches_list = [coach for coach in coach_list if coach.coach_id != coach_id_deletable]
@@ -184,6 +187,7 @@ def remove_team(team_id_deletable):
 		print('The team id was not found in the database.')
 	return new_teams_list
 
+
 def coaches_by_name(first_name_to_find):
 	"""coaches_by_name van+Gundy"""
 	# filter out the coaches by name find matching ones
@@ -195,16 +199,59 @@ def coaches_by_name(first_name_to_find):
 		print('No coaches with specified first name were found.')
 
 
-def teams_by_city_league(city, league):
+def teams_by_city_league(city_input, league_input):
 	"""teams_by_city_league Los+Angeles A"""
-	pass
+	# list comprehension to filter out teams with matching city and location
+	teams_by_city_league_list = [team
+	                             for team
+	                             in team_list
+	                             if team.location.lower() == city_input.lower()
+	                             and team.league.lower() == league_input.lower()]
 
-def best_coach():
+	# if any teams populated the new list, we print them out, otherwise notify user that no search results present
+	if teams_by_city_league_list:
+		print_teams(teams_by_city_league_list)
+	else:
+		print('No teams with specified city (location) and league were found.')
+
+
+def best_coach(year):
+	# filter coaches from that year
+	coaches_from_the_year = [coach for coach in coach_list if coach.season == year]
 	"""(season_win - season_loss) + (playoff_win - playoff_loss)"""
-	pass
+	# setup the initial score
+	current_best_score = -1000
+	# iterate through the list of coaches at the moment
+	if coaches_from_the_year:
+		for coach in coaches_from_the_year:
+			# determine score
+			score = (coach.season_win - coach.season_loss) + (coach.playoff_win - coach.playoff_loss)
+			# if the score we are looking at is better than previous one we reinstate the current
+			# best score and setup the coach to be the best coach
+			if score >= current_best_score:
+				current_best_score = score
+				best_c = coach
+		print(f'{best_c.first_name} {best_c.last_name}')
+	else:
+		print('No coaches were found from the season specified')
+
 
 def search_coaches(search_criteria_dict):
-	pass
+	filtered_list = coach_list
+	for key in search_criteria_dict.keys():
+	# for i in range(len(search_criteria_dict)):
+		print('prior iteration...')
+		print_coaches(filtered_list)
+		# key = str(next(iter(search_criteria_dict)))
+		print(f"The key we look into is: {key}")
+		new_filter = [coach for coach in filtered_list if getattr(coach, key) == search_criteria_dict[key]]
+		filtered_list = new_filter
+		print('after iteration...')
+		print_coaches(new_filter)
+
+	print('final list....')
+	print_coaches(filtered_list)
+
 
 print('Welcome to the Pythonista Database Management System.\n'
       'Please type your query.\n'
@@ -259,13 +306,21 @@ while query != 'q':
 		# modify the name character + to be space
 		name = query_list[1].replace('+', ' ')
 		coaches_by_name(name)
-	# TODO
 	elif leading_command == 'teams_by_city_league':
-		teams_by_city_league('city', 'league')
+		city = query_list[1].replace('+', ' ')
+		league = query_list[2]
+		teams_by_city_league(city, league)
 	elif leading_command == 'best_coach':
-		best_coach()
+		season_year = query_list[1]
+		best_coach(season_year)
+	# TODO
 	elif leading_command == 'search_coaches':
-		search_coaches('field list')
+		field_list = query_list[1:]
+		field_dictionary = {}
+		for field in field_list:
+			buffer = field.split('=')
+			field_dictionary[buffer[0]] = buffer[1]
+		search_coaches(field_dictionary)
 	else:
 		print('invalid command')
 

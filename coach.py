@@ -11,6 +11,6 @@ class Coach:
         self.team = team
 
     def __repr__(self):
-        return "{0:<10} {1:<10} {2:<10} {3:<10} {4:<10} {5:<10} {6:<10} {7:<10} {8:<10}".format(self.coach_id,self.season, self.first_name, self.last_name, self.season_win, self.season_loss, self.playoff_win, self.playoff_loss, self.team)
+        return "{0:<10} {1:<10} {2:<10} {3:<10} {4:<10} {5:<10} {6:<10} {7:<10} {8:<10}".format(self.coach_id, self.season, self.first_name, self.last_name, self.season_win, self.season_loss, self.playoff_win, self.playoff_loss, self.team)
 
 
