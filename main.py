@@ -1,5 +1,9 @@
 # questions
 # 1. is the remove functionality only required to work with coach_ID and team_ID?
+# 2. in project specification you mention the requirement to make sure there aren't any digits in our coaches names
+	# however in the example input output you proceed to load the coach John Proba1 into the database
+# 3. First team Begin fuuls has BEGIN as the team id in the input/output file and BEG in the file given to load. Which one is final one?
+
 from coach import Coach
 from team import Team
 import csv
@@ -156,14 +160,51 @@ def load_teams(file_name):
 			add_team(row)
 
 
-def print_coaches():
-	for coach in coach_list:
+def print_coaches(coaches):
+	for coach in coaches:
 		print(coach)
 
 
-def print_teams():
-	for team in team_list:
+def print_teams(teams):
+	for team in teams:
 		print(team)
+
+def remove_coach(coach_id_deletable):
+	# filter the new coach list from the current coach list by not having the coaches with ID to remove
+	new_coaches_list = [coach for coach in coach_list if coach.coach_id != coach_id_deletable]
+	if new_coaches_list == coach_list:
+		print('The coach id was not found in the database.')
+	return new_coaches_list
+
+
+def remove_team(team_id_deletable):
+	# filter the new team list from the current tem list by not having the teams with ID to remove
+	new_teams_list = [team for team in team_list if team.team_id != team_id_deletable]
+	if new_teams_list == team_list:
+		print('The team id was not found in the database.')
+	return new_teams_list
+
+def coaches_by_name(first_name_to_find):
+	"""coaches_by_name van+Gundy"""
+	# filter out the coaches by name find matching ones
+	coaches_list_by_name = [coach for coach in coach_list if coach.first_name.lower() == first_name_to_find.lower()]
+	# if any coaches populated the new list, we print them out
+	if coaches_list_by_name:
+		print_coaches(coaches_list_by_name)
+	else:
+		print('No coaches with specified first name were found.')
+
+
+def teams_by_city_league(city, league):
+	"""teams_by_city_league Los+Angeles A"""
+	pass
+
+def best_coach():
+	"""(season_win - season_loss) + (playoff_win - playoff_loss)"""
+	pass
+
+def search_coaches(search_criteria_dict):
+	pass
 
 print('Welcome to the Pythonista Database Management System.\n'
       'Please type your query.\n'
@@ -204,13 +245,27 @@ while query != 'q':
 		else:
 			print("Invalid amount of arguments to load teams from file to the database.")
 	elif leading_command == 'remove_coach':
-		pass
+		# we split the query list item 1 (coach_id=BLAH) by '=' character and get the item 1 which is the actual id.
+		coach_id_to_remove = query_list[1].split('=')[1]
+		coach_list = remove_coach(coach_id_to_remove)
 	elif leading_command == 'remove_team':
-		pass
+		team_id_to_remove = query_list[1].split('=')[1]
+		team_list = remove_team(team_id_to_remove)
 	elif leading_command == 'print_coaches':
-		print_coaches()
+		print_coaches(coach_list)
 	elif leading_command == 'print_teams':
-		print_teams()
+		print_teams(team_list)
+	elif leading_command == 'coaches_by_name':
+		# modify the name character + to be space
+		name = query_list[1].replace('+', ' ')
+		coaches_by_name(name)
+	# TODO
+	elif leading_command == 'teams_by_city_league':
+		teams_by_city_league('city', 'league')
+	elif leading_command == 'best_coach':
+		best_coach()
+	elif leading_command == 'search_coaches':
+		search_coaches('field list')
 	else:
 		print('invalid command')
 
