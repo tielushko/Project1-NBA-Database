@@ -3,7 +3,7 @@
 # 2. in project specification you mention the requirement to make sure there aren't any digits in our coaches names
 # however in the example input output you proceed to load the coach John Proba1 into the database
 # 3. First team Begin fuuls has BEGIN as the team id in the input/output file and BEG in the file given to load. Which one is final one?
-
+# 4. test case coaches_by_name John only prints out John end end when john egan is present in the table still....
 from coach import Coach
 from team import Team
 import csv
@@ -237,29 +237,33 @@ def best_coach(year):
 
 
 def search_coaches(search_criteria_dict):
-	filtered_list = coach_list
+	first_run = True
 	for key in search_criteria_dict.keys():
-	# for i in range(len(search_criteria_dict)):
-		print('prior iteration...')
+		if first_run:
+			first_run = False
+			# notice that I need to do the conversion to strin in case the stored coach games are an int, comparison will fail
+			filtered_list = [coach for coach in coach_list if str(getattr(coach, str(key))) == search_criteria_dict[key]]
+		else:
+			filtered_list = [coach for coach in filtered_list if str(getattr(coach, str(key))) == search_criteria_dict[key]]
+
+	if filtered_list:
 		print_coaches(filtered_list)
-		# key = str(next(iter(search_criteria_dict)))
-		print(f"The key we look into is: {key}")
-		new_filter = [coach for coach in filtered_list if getattr(coach, key) == search_criteria_dict[key]]
-		filtered_list = new_filter
-		print('after iteration...')
-		print_coaches(new_filter)
+	else:
+		print('No coaches were found with attributes specified...')
 
-	print('final list....')
-	print_coaches(filtered_list)
-
+def filter_coaches(coach, criteria_key, criteria_value):
+	if getattr(coach, str(criteria_key)) == criteria_value:
+		return True
+	else:
+		return False
 
 print('Welcome to the Pythonista Database Management System.\n'
       'Please type your query.\n'
       'Type "help" for list of available queries.\n'
-      'Type "q" to exit the program.\n')
+      'Type "exit" to exit the program.\n')
 
 query = input('pythonistaDBMS?>>')
-while query != 'q':
+while query != 'exit':
 	query_list = query.split()
 	# print(query_list)
 	leading_command = query_list[0]
@@ -313,13 +317,14 @@ while query != 'q':
 	elif leading_command == 'best_coach':
 		season_year = query_list[1]
 		best_coach(season_year)
-	# TODO
 	elif leading_command == 'search_coaches':
 		field_list = query_list[1:]
 		field_dictionary = {}
 		for field in field_list:
 			buffer = field.split('=')
 			field_dictionary[buffer[0]] = buffer[1]
+		# for key in field_dictionary.keys():
+		# 	field_dictionary
 		search_coaches(field_dictionary)
 	else:
 		print('invalid command')
