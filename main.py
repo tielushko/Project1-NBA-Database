@@ -8,6 +8,8 @@ from coach import Coach
 from team import Team
 import csv
 
+# print both best coaches in best_coach query
+
 # coaches_by_name is the query structured as first_name=John or just john?
 coach_list = []
 team_list = []
@@ -221,17 +223,23 @@ def best_coach(year):
 	"""(season_win - season_loss) + (playoff_win - playoff_loss)"""
 	# setup the initial score
 	current_best_score = -1000
-	# iterate through the list of coaches at the moment
+	best_coaches_list = []
+	# iterate through the list of coaches from that year
 	if coaches_from_the_year:
 		for coach in coaches_from_the_year:
 			# determine score
 			score = (coach.season_win - coach.season_loss) + (coach.playoff_win - coach.playoff_loss)
-			# if the score we are looking at is better than previous one we reinstate the current
-			# best score and setup the coach to be the best coach
-			if score >= current_best_score:
+			# once we get the new high score, we need to flush the list, and reinitialize the new best score,
+			# add new coach to list
+			if score > current_best_score:
 				current_best_score = score
-				best_c = coach
-		print(f'{best_c.first_name} {best_c.last_name}')
+				best_coaches_list.clear()
+				best_coaches_list.append(coach)
+			# otherwise if score is equal,
+			elif score == current_best_score:
+				best_coaches_list.append(coach)
+		for coach in best_coaches_list:
+			print(f'{coach.first_name} {coach.last_name}')
 	else:
 		print('No coaches were found from the season specified')
 
@@ -241,7 +249,7 @@ def search_coaches(search_criteria_dict):
 	for key in search_criteria_dict.keys():
 		if first_run:
 			first_run = False
-			# notice that I need to do the conversion to strin in case the stored coach games are an int, comparison will fail
+			# notice that I need to do the conversion to string in case the stored coach games are an int, comparison will fail
 			filtered_list = [coach for coach in coach_list if str(getattr(coach, str(key))) == search_criteria_dict[key]]
 		else:
 			filtered_list = [coach for coach in filtered_list if str(getattr(coach, str(key))) == search_criteria_dict[key]]
